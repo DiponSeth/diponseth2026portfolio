@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Review Submission</title>
+  <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet" />
+  <link rel="stylesheet" href="review.css" />
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.10.2/build/spline-viewer.js"></script>
+</head>
+<body>
+
+<!-- Spline Background -->
+<spline-viewer url="https://prod.spline.design/ovB5oRSSzf6Gfa9s/scene.splinecode"></spline-viewer>
+<div class="spline-dark-overlay"></div>
+
+<!-- Navbar -->
+<div class="container">
+  <header class="navbar">
+    <div class="navbar-left">
+      <img data-aos="fade-down" data-aos-duration="1500" src="NAZITO WITH TEXT.png" alt="Nazito Logo" class="logo-img" />
+    </div>
+    <nav>
+      <a data-aos="fade-down" data-aos-duration="1500" href="#">HOME</a>
+      <a data-aos="fade-down" data-aos-duration="2000" href="#">ABOUT</a>
+      <a data-aos="fade-down" data-aos-duration="2500" href="#">PORTFOLIO</a>
+      <a data-aos="fade-down" data-aos-duration="3000" href="#">CONTACT</a>
+    </nav>
+    <button type="submit" class="btn-signing">QUICK CHAT</button>
+  </header>
+</div>
+
+<!-- Review Form -->
+<div class="review-wrapper">
+  <div class="review-box">
+    <h1>Spread the word about your experience</h1>
+    <h3>Your name will appear with this review</h3>
+    <h4>Rate a Star</h4>
+    <form method="POST" action="https://api.web3forms.com/submit">
+      <input type="hidden" name="access_key" value="ce9aa2bb-5fbe-410e-bc82-0aef031a7567" />
+    <div class="star-rating">
+      <input type="hidden" name="stars" id="star-value" required />
+      <span class="star" data-value="1">&#9734;</span>
+      <span class="star" data-value="2">&#9734;</span>
+      <span class="star" data-value="3">&#9734;</span>
+      <span class="star" data-value="4">&#9734;</span>
+      <span class="star" data-value="5">&#9734;</span>
+    </div>
+
+    
+    <label for="name">Full Name</label>
+    <div class="input-wrapper">
+      <input type="text" id="name" name="name" placeholder="Enter Full name..." required />
+    </div>
+    
+    <label for="comment">Write Review</label>
+    <div class="input-wrapper">
+      <textarea id="comment" name="comment" placeholder="Write a review..." required></textarea>
+    </div>
+  
+      <div class="button-wrapper">
+        <button type="submit" class="btn-review">Send your review</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- AOS Init -->
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 100, easing: 'ease-in-out', once: true });
+
+  // Remove Spline branding
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const spline = document.querySelector('spline-viewer');
+      spline?.shadowRoot?.querySelector('[slot="branding"]')?.style.setProperty('display', 'none');
+    }, 2000);
+  });
+
+  // Star rating logic
+  const stars = document.querySelectorAll('.star');
+  const starValueInput = document.getElementById('star-value');
+  let selectedRating = 0;
+
+  stars.forEach((star, index) => {
+    star.addEventListener('mouseover', () => {
+      updateStars(index + 1, true);
+    });
+
+    star.addEventListener('mouseout', () => {
+      updateStars(selectedRating, false);
+    });
+
+    star.addEventListener('click', () => {
+      selectedRating = index + 1;
+      starValueInput.value = selectedRating;
+      updateStars(selectedRating, false);
+    });
+  });
+
+  function updateStars(count, preview) {
+    stars.forEach((star, i) => {
+      star.innerHTML = i < count ? '&#9733;' : '&#9734;';
+      star.classList.toggle('selected', i < count && !preview);
+    });
+  }
+</script>
+
+
+</body>
+</html>
