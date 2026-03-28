@@ -555,17 +555,17 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="shorts-track">
 
           <!-- VIDEOS -->
-          <video src="short1.mp4" class="short-slide" playsinline loop></video>
-          <video src="short2.mp4" class="short-slide" playsinline loop></video>
-          <video src="short3.mp4" class="short-slide" playsinline loop></video>
-          <video src="short4.mp4" class="short-slide" playsinline loop></video>
-          <video src="short5.mp4" class="short-slide" playsinline loop></video>
-          <video src="short6.mp4" class="short-slide" playsinline loop></video>
-          <video src="short7.mp4" class="short-slide" playsinline loop></video>
-          <video src="short8.mp4" class="short-slide" playsinline loop></video>
-          <video src="short9.mp4" class="short-slide" playsinline loop></video>
-          <video src="short10.mp4" class="short-slide" playsinline loop></video>
-          <video src="short11.mp4" class="short-slide" playsinline loop></video>
+          <video src="short1.mp4" class="short-slide" playsinline loop controls preload="metadata"></video>
+          <video src="short2.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short3.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short4.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short5.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short6.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short7.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short8.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short9.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short10.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
+          <video src="short11.mp4" class="short-slide" playsinline loop  controls preload="metadata"></video>
 
         </div>
 
@@ -595,8 +595,8 @@ function updateCarousel() {
   const fullSlideWidth = slideWidth + gap;
   const wrapperWidth = slider.offsetWidth;
 
-  // 🔥 Shift active video slightly to center inside phone frame
-  const centerAdjust = 738.9; // try 15 to 35 if needed
+  // Shift active video to center inside phone frame
+  const centerAdjust = 738.9;
 
   const offset = -(index * fullSlideWidth - (wrapperWidth / 2 - slideWidth / 2)) + centerAdjust;
   track.style.transform = `translateX(${offset}px)`;
@@ -606,14 +606,16 @@ function updateCarousel() {
 
     if (i === index) {
       video.classList.add('active');
-      video.muted = true;
-      video.play().catch(() => {});
+
+      // 🔥 DO NOT force mute
+      video.play().catch(() => {
+        console.log("Autoplay blocked until user interacts.");
+      });
     } else {
       video.pause();
       video.currentTime = 0;
     }
 
-    // Optional: side reels styling
     if (i === index - 1 || i === index + 1) {
       video.classList.add('near');
     }
