@@ -582,50 +582,44 @@ const track = document.querySelector('.shorts-track');
 const videos = document.querySelectorAll('.short-slide');
 const prevBtn = document.querySelector('.prev-btn');
 const nextBtn = document.querySelector('.next-btn');
+const slider = document.querySelector('.shorts-slider');
 
 let index = Math.floor(videos.length / 2);
 
-// MAIN FUNCTION
 function updateCarousel() {
+  if (!videos.length) return;
 
-  const slideWidth = videos[0].offsetWidth + 30;
-  const wrapperWidth = track.parentElement.offsetWidth;
+  const slideWidth = videos[0].offsetWidth;
+  const trackStyle = getComputedStyle(track);
+  const gap = parseFloat(trackStyle.gap) || 0;
+  const fullSlideWidth = slideWidth + gap;
+  const wrapperWidth = slider.offsetWidth;
 
-  const offset = -(index * slideWidth - (wrapperWidth / 2 - slideWidth / 2));
+  // 🔥 Shift active video slightly to center inside phone frame
+  const centerAdjust = 748; // try 15 to 35 if needed
+
+  const offset = -(index * fullSlideWidth - (wrapperWidth / 2 - slideWidth / 2)) + centerAdjust;
   track.style.transform = `translateX(${offset}px)`;
 
-  // 🔥 FIND ACTUAL CENTER VIDEO (IMPORTANT FIX)
-  let closestIndex = 0;
-  let minDistance = Infinity;
-
   videos.forEach((video, i) => {
-    const rect = video.getBoundingClientRect();
-    const videoCenter = rect.left + rect.width / 2;
-    const screenCenter = window.innerWidth / 2;
+    video.classList.remove('active', 'near');
 
-    const distance = Math.abs(screenCenter - videoCenter);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestIndex = i;
-    }
-  });
-
-  // 🎯 PLAY ONLY CENTER VIDEO
-  videos.forEach((video, i) => {
-    if (i === closestIndex) {
+    if (i === index) {
       video.classList.add('active');
       video.muted = true;
       video.play().catch(() => {});
     } else {
-      video.classList.remove('active');
       video.pause();
       video.currentTime = 0;
+    }
+
+    // Optional: side reels styling
+    if (i === index - 1 || i === index + 1) {
+      video.classList.add('near');
     }
   });
 }
 
-// BUTTONS
 prevBtn.addEventListener('click', () => {
   index = (index - 1 + videos.length) % videos.length;
   updateCarousel();
@@ -636,19 +630,17 @@ nextBtn.addEventListener('click', () => {
   updateCarousel();
 });
 
-// INITIAL LOAD
-window.addEventListener('load', updateCarousel);
-
-// 🔁 Pause others when manually played
-videos.forEach(video => {
-  video.addEventListener('play', () => {
-    videos.forEach(other => {
-      if (other !== video) other.pause();
-    });
+videos.forEach((video, i) => {
+  video.addEventListener('click', () => {
+    index = i;
+    updateCarousel();
   });
 });
 
-// ❌ Disable right-click on videos
+window.addEventListener('load', updateCarousel);
+window.addEventListener('resize', updateCarousel);
+
+// Disable right click on videos
 document.addEventListener("contextmenu", function (e) {
   if (e.target.tagName === "VIDEO") {
     e.preventDefault();
