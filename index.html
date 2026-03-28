@@ -535,10 +535,6 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- 04. Short Form Editing Slider Template -->
 <section id="shorts" class="shorts-section">
 
-  <div class="spline-wrapper">
-    <spline-viewer class="skills-bg" url="https://prod.spline.design/93WLvCg5EB7AmKPB/scene.splinecode"></spline-viewer>
-  </div>
-
   <div class="skills-content">
 
     <section class="skills-heading">
@@ -559,19 +555,17 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="shorts-track">
 
           <!-- VIDEOS -->
-          <video src="short1.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short2.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short3.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short4.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short5.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short6.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short7.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-
-          <!-- NEW VIDEOS -->
-          <video src="short8.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short9.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short10.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
-          <video src="short11.mp4" class="short-slide" controls playsinline loop preload="metadata"></video>
+          <video src="short1.mp4" class="short-slide" playsinline loop></video>
+          <video src="short2.mp4" class="short-slide" playsinline loop></video>
+          <video src="short3.mp4" class="short-slide" playsinline loop></video>
+          <video src="short4.mp4" class="short-slide" playsinline loop></video>
+          <video src="short5.mp4" class="short-slide" playsinline loop></video>
+          <video src="short6.mp4" class="short-slide" playsinline loop></video>
+          <video src="short7.mp4" class="short-slide" playsinline loop></video>
+          <video src="short8.mp4" class="short-slide" playsinline loop></video>
+          <video src="short9.mp4" class="short-slide" playsinline loop></video>
+          <video src="short10.mp4" class="short-slide" playsinline loop></video>
+          <video src="short11.mp4" class="short-slide" playsinline loop></video>
 
         </div>
 
@@ -583,66 +577,83 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </section>
 
-<!-- SCRIPT -->
 <script>
-  const track = document.querySelector('.shorts-track');
-  const videos = document.querySelectorAll('.short-slide');
-  const prevBtn = document.querySelector('.prev-btn');
-  const nextBtn = document.querySelector('.next-btn');
+const track = document.querySelector('.shorts-track');
+const videos = document.querySelectorAll('.short-slide');
+const prevBtn = document.querySelector('.prev-btn');
+const nextBtn = document.querySelector('.next-btn');
 
-  let index = Math.floor(videos.length / 2);
+let index = Math.floor(videos.length / 2);
 
-  function updateCarousel() {
+// MAIN FUNCTION
+function updateCarousel() {
 
-    const slideWidth = videos[0].offsetWidth + 30;
+  const slideWidth = videos[0].offsetWidth + 30;
+  const wrapperWidth = track.parentElement.offsetWidth;
 
-    const offset = -(index * slideWidth - ((track.parentElement.offsetWidth - slideWidth) / 2));
-    track.style.transform = `translateX(${offset}px)`;
+  const offset = -(index * slideWidth - (wrapperWidth / 2 - slideWidth / 2));
+  track.style.transform = `translateX(${offset}px)`;
 
-    videos.forEach((video, i) => {
-      if (i === index) {
-        video.classList.add('active');
-        video.muted = true; // safer autoplay
-        video.play().catch(() => {});
-      } else {
-        video.classList.remove('active');
-        video.pause();
-        video.currentTime = 0;
-      }
-    });
-  }
+  // 🔥 FIND ACTUAL CENTER VIDEO (IMPORTANT FIX)
+  let closestIndex = 0;
+  let minDistance = Infinity;
 
-  prevBtn.addEventListener('click', () => {
-    index = (index - 1 + videos.length) % videos.length;
-    updateCarousel();
-  });
+  videos.forEach((video, i) => {
+    const rect = video.getBoundingClientRect();
+    const videoCenter = rect.left + rect.width / 2;
+    const screenCenter = window.innerWidth / 2;
 
-  nextBtn.addEventListener('click', () => {
-    index = (index + 1) % videos.length;
-    updateCarousel();
-  });
+    const distance = Math.abs(screenCenter - videoCenter);
 
-  window.addEventListener('load', updateCarousel);
-
-  // Pause others when one plays manually
-  const shortVideos = document.querySelectorAll('.short-slide');
-
-  shortVideos.forEach(video => {
-    video.addEventListener('play', () => {
-      shortVideos.forEach(other => {
-        if (other !== video) {
-          other.pause();
-        }
-      });
-    });
-  });
-
-  // Disable right-click on videos
-  document.addEventListener("contextmenu", function (e) {
-    if (e.target.tagName === "VIDEO") {
-      e.preventDefault();
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestIndex = i;
     }
   });
+
+  // 🎯 PLAY ONLY CENTER VIDEO
+  videos.forEach((video, i) => {
+    if (i === closestIndex) {
+      video.classList.add('active');
+      video.muted = true;
+      video.play().catch(() => {});
+    } else {
+      video.classList.remove('active');
+      video.pause();
+      video.currentTime = 0;
+    }
+  });
+}
+
+// BUTTONS
+prevBtn.addEventListener('click', () => {
+  index = (index - 1 + videos.length) % videos.length;
+  updateCarousel();
+});
+
+nextBtn.addEventListener('click', () => {
+  index = (index + 1) % videos.length;
+  updateCarousel();
+});
+
+// INITIAL LOAD
+window.addEventListener('load', updateCarousel);
+
+// 🔁 Pause others when manually played
+videos.forEach(video => {
+  video.addEventListener('play', () => {
+    videos.forEach(other => {
+      if (other !== video) other.pause();
+    });
+  });
+});
+
+// ❌ Disable right-click on videos
+document.addEventListener("contextmenu", function (e) {
+  if (e.target.tagName === "VIDEO") {
+    e.preventDefault();
+  }
+});
 </script>
 
 <!-- 05. Long Form Editings -->
